@@ -5,28 +5,46 @@ import (
 	"strings"
 )
 
+type Tags map[string]string
+type Fields map[string]any
+type Hash map[string]string
+
 type Line struct {
 	measurement string
-	tags        map[string]string
-	fields      map[string]string
+	tags        Tags
+	fields      Fields
 }
 
 func NewLine(measurement string) *Line {
 	line := Line{
 		measurement: measurement,
-		tags:        make(map[string]string),
-		fields:      make(map[string]string),
+		tags:        make(Tags),
+		fields:      make(Fields),
 	}
 
 	return &line
 }
 
-func mapToString(hash map[string]string) string {
+func (line Line) TagsToString() string {
 	items := make([]string, 0)
-	for key, value := range hash {
+	for key, value := range line.tags {
 		items = append(items, key+"="+strings.ReplaceAll(value, " ", "\\ "))
 	}
 	return strings.Join(items, ",")
+}
+
+func (line Line) FieldsToString() string {
+	items := make([]string, 0)
+	for key, value := range line.fields {
+		items = append(items, key+"="+strings.ReplaceAll(fmt.Sprint(value), " ", "\\ "))
+	}
+	return strings.Join(items, ",")
+}
+
+func (line *Line) AddTags(tags Tags) {
+	for key, value := range tags {
+		line.AddTag(key, value)
+	}
 }
 
 func (line *Line) AddTag(key string, value any) {
@@ -37,12 +55,13 @@ func (line *Line) AddField(key string, value any) {
 	line.fields[key] = fmt.Sprint(value)
 }
 
-// TODO: This assumes there is at least 1 tag and 1 field
-func (line Line) ToString() string {
-	return fmt.Sprintf("%s,%s %s", line.measurement, mapToString(line.tags), mapToString(line.fields))
+func (line *Line) AddFields(fields Fields) {
+	for key, value := range fields {
+		line.AddField(key, value)
+	}
 }
 
-func (line Line) Dump() {
-	fmt.Printf("Tags: %s\n", mapToString(line.tags))
-	fmt.Printf("Fields: %s\n", mapToString(line.fields))
+// TODO: This assumes there is at least 1 tag and 1 field
+func (line Line) ToString() string {
+	return fmt.Sprintf("%s,%s %s", line.measurement, line.TagsToString(), line.FieldsToString())
 }
