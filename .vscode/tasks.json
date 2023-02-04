@@ -16,7 +16,7 @@
       "presentation": {
         "clear": true
       },
-      "command": "go run cmd/topprocs/main.go 55187"
+      "command": "go run cmd/topprocs/main.go --cpu-percent 2.0"
     }
   ]
 }

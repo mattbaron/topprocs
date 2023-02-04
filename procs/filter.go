@@ -1,9 +1,10 @@
 package procs
 
+// Threads and MemoryPercent are typed the way they are to make flag work :(
 type Filter struct {
 	CPUPercent    float64
-	MemoryPercent float32
-	Threads       int32
+	MemoryPercent float64
+	Threads       int64
 	Users         []string
 }
 
@@ -17,5 +18,5 @@ func NewFilter() Filter {
 }
 
 func (filter Filter) Match(p Proc) bool {
-	return p.CPUPercent >= filter.CPUPercent || p.MemoryPercent >= filter.MemoryPercent || p.NumThreads >= filter.Threads
+	return p.CPUPercent >= filter.CPUPercent || p.MemoryPercent >= float32(filter.MemoryPercent) || p.NumThreads >= int32(filter.Threads)
 }
