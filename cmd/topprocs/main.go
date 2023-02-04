@@ -29,6 +29,8 @@ func Exit(code int, err any) {
 }
 
 func GatherMetrics(measurement string, process *process.Process) *line.Line {
+
+	// Collect basic metrics to determine if this is an interesting proc
 	memPercent, err := process.MemoryPercent()
 	if err != nil {
 		return nil
@@ -53,24 +55,6 @@ func GatherMetrics(measurement string, process *process.Process) *line.Line {
 		return nil
 	}
 
-	line := line.NewLine(measurement)
-
-	line.AddField("cpu_usage", cpuPercent)
-	line.AddField("memory_usage", memPercent)
-
-	line.AddField("memory_rss", mem.RSS)
-	line.AddField("memory_vms", mem.VMS)
-	line.AddField("memory_swap", mem.Swap)
-
-	line.AddField("num_threads", numThreads)
-
-	line.AddTag("pid", process.Pid)
-
-	user, err := process.Username()
-	if err == nil {
-		line.AddTag("user", user)
-	}
-
 	name, err := process.Name()
 	if err != nil {
 		return nil
@@ -80,7 +64,22 @@ func GatherMetrics(measurement string, process *process.Process) *line.Line {
 		return nil
 	}
 
+	line := line.NewLine(measurement)
+
+	line.AddField("cpu_usage", cpuPercent)
+	line.AddField("memory_usage", memPercent)
+	line.AddField("memory_rss", mem.RSS)
+	line.AddField("memory_vms", mem.VMS)
+	line.AddField("memory_swap", mem.Swap)
+	line.AddField("num_threads", numThreads)
+
+	line.AddTag("pid", process.Pid)
 	line.AddTag("name", name)
+
+	user, err := process.Username()
+	if err == nil {
+		line.AddTag("user", user)
+	}
 
 	cpuTime, err := process.Times()
 	if err == nil {
