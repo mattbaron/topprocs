@@ -7,7 +7,6 @@ import (
 
 type Tags map[string]string
 type Fields map[string]any
-type Hash map[string]string
 
 type Line struct {
 	measurement string
@@ -36,7 +35,8 @@ func (line Line) TagsToString() string {
 func (line Line) FieldsToString() string {
 	items := make([]string, 0)
 	for key, value := range line.fields {
-		items = append(items, key+"="+strings.ReplaceAll(fmt.Sprint(value), " ", "\\ "))
+		// TODO: Need to figure out a way to detect string data and quote
+		items = append(items, key+"="+fmt.Sprint(value))
 	}
 	return strings.Join(items, ",")
 }
@@ -52,7 +52,7 @@ func (line *Line) AddTag(key string, value any) {
 }
 
 func (line *Line) AddField(key string, value any) {
-	line.fields[key] = fmt.Sprint(value)
+	line.fields[key] = value
 }
 
 func (line *Line) AddFields(fields Fields) {

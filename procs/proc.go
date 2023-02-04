@@ -9,7 +9,7 @@ import (
 )
 
 type Proc struct {
-	*process.Process
+	p             *process.Process
 	Pid           int32
 	Name          string
 	CPUPercent    float64
@@ -28,57 +28,62 @@ func NewProc(pid int32) *Proc {
 		return nil
 	}
 
-	proc := Proc{Process: process}
-	proc.GatherMetrics()
-	return &proc
+	proc := Proc{p: process}
+	err = proc.GatherMetrics()
+
+	if err != nil {
+		return nil
+	} else {
+		return &proc
+	}
 }
 
 func (proc *Proc) GatherMetrics() error {
-	proc.Pid = proc.Process.Pid
+	proc.Pid = proc.p.Pid
 
-	cpuPercent, err := proc.Process.CPUPercent()
+	cpuPercent, err := proc.p.CPUPercent()
 	if err == nil {
 		proc.CPUPercent = cpuPercent
 	} else {
 		return err
 	}
 
-	memPercent, err := proc.Process.MemoryPercent()
+	memPercent, err := proc.p.MemoryPercent()
 	if err == nil {
 		proc.MemoryPercent = memPercent
 	} else {
 		return err
 	}
 
-	numThreads, err := proc.Process.NumThreads()
+	numThreads, err := proc.p.NumThreads()
 	if err == nil {
 		proc.NumThreads = numThreads
 	} else {
 		return err
 	}
 
-	name, err := proc.Process.Name()
+	name, err := proc.p.Name()
 	if err == nil {
 		proc.Name = name
 	} else {
 		return err
 	}
 
-	user, err := proc.Process.Username()
+	user, err := proc.p.Username()
 	if err == nil {
 		proc.User = user
 	} else {
 		return err
 	}
 
-	memoryInfo, err := proc.Process.MemoryInfo()
+	memoryInfo, err := proc.p.MemoryInfo()
 	if err == nil {
 		proc.MemoryInfo = *memoryInfo
 	} else {
 		return err
 	}
 
-	cpuTime, err := proc.Process.Times()
+	cpuTime, err := proc.p.Times()
 	if err == nil {
 		proc.CPUTime = *cpuTime
 	} else {
@@ -94,6 +99,7 @@ func (proc Proc) Tags() line.Tags {
 		"pid":  fmt.Sprint(proc.Pid),
 		"user": proc.User,
 	}
+
 	return tags
 }
 
@@ -115,4 +121,32 @@ func (proc Proc) Fields() line.Fields {
 
 func (proc *Proc) ToString() string {
 	return fmt.Sprintf("name=%s, cpu=%f, mem=%f, t=%d", proc.Name, proc.CPUPercent, proc.MemoryPercent, proc.NumThreads)
+}
+
+func AllPids() []int32 {
+	pids, err := process.Pids()
+
+	if err != nil {
+		return make([]int32, 0)
+	}
+
+	return pids
+}
+
+func FindInteresting(filter Filter) []*Proc {
+	procs := make([]*Proc, 0)
+
+	for _, pid := range AllPids() {
+		proc := NewProc(pid)
+
+		if proc == nil {
+			continue
+		}
+
+		if filter.Match(*proc) {
+			procs = append(procs, proc)
+		}
+	}
+
+	return procs
 }
