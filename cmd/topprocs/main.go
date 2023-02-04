@@ -6,20 +6,11 @@ import (
 	"path/filepath"
 
 	"github.com/mattbaron/topprocs/line"
+	"github.com/mattbaron/topprocs/procs"
 	"github.com/shirou/gopsutil/process"
 )
 
 var progname = filepath.Base(os.Args[0])
-
-func FindProcesses() ([]int32, error) {
-	procs, err := process.Pids()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return procs, nil
-}
 
 func Exit(code int, err any) {
 	if code != 0 {
@@ -92,7 +83,7 @@ func GatherMetrics(measurement string, process *process.Process) *line.Line {
 }
 
 func main() {
-	processes, err := FindProcesses()
+	processes, err := procs.FindAll()
 	if err != nil {
 		Exit(4, err)
 	}
