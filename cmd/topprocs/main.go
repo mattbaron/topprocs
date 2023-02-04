@@ -110,44 +110,4 @@ func main() {
 			fmt.Println(line.ToString())
 		}
 	}
-
-	Exit(0, nil)
-
-	// proc, err := process.NewProcess(int32(pid))
-	// if err != nil {
-	// 	Exit(3, err)
-	// }
-
-	// PrintMetric("PID", pid, nil)
-
-	// cpuPercent, err := proc.CPUPercent()
-	// PrintMetric("CPU Percent", cpuPercent, err)
-
-	// memPercent, err := proc.MemoryPercent()
-	// PrintMetric("Mem Percent", memPercent, err)
-
-	// info, err := proc.MemoryInfo()
-	// if err == nil {
-	// 	PrintMetric("Swap", info.Swap, nil)
-	// 	PrintMetric("RSS", info.RSS, nil)
-	// 	PrintMetric("VMS", info.VMS, nil)
-	// }
-
-	// cpuTime, err := proc.Times()
-	// if err == nil {
-	// 	PrintMetric("CPU User Time", cpuTime.User, nil)
-	// 	PrintMetric("CPU System Time", cpuTime.System, nil)
-	// 	PrintMetric("CPU Total Time", cpuTime.User+cpuTime.System, nil)
-	// 	PrintMetric("CPU IO Wait", cpuTime.Iowait, nil)
-	// }
-
-	// io, err := proc.IOCounters()
-	// if err == nil {
-	// 	PrintMetric("IO Read", io.ReadCount, err)
-	// 	PrintMetric("IO Write", io.WriteBytes, err)
-	// }
-
-	// numThreads, err := proc.NumThreads()
-	// PrintMetric("Threads", numThreads, err)
-
 }
