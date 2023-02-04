@@ -3,10 +3,13 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/mattbaron/topprocs/line"
 	"github.com/shirou/gopsutil/process"
 )
+
+var progname = filepath.Base(os.Args[0])
 
 func FindProcesses() ([]int32, error) {
 	procs, err := process.Pids()
@@ -52,28 +55,41 @@ func GatherMetrics(measurement string, process *process.Process) *line.Line {
 
 	line := line.NewLine(measurement)
 
+	line.AddField("cpu_usage", cpuPercent)
+	line.AddField("memory_usage", memPercent)
+
 	line.AddField("memory_rss", mem.RSS)
 	line.AddField("memory_vms", mem.VMS)
 	line.AddField("memory_swap", mem.Swap)
-	line.AddField("memory_data", mem.Data)
 
 	line.AddField("num_threads", numThreads)
 
 	line.AddTag("pid", process.Pid)
+
+	user, err := process.Username()
+	if err == nil {
+		line.AddTag("user", user)
+	}
 
 	name, err := process.Name()
 	if err != nil {
 		return nil
 	}
 
+	if name == progname {
+		return nil
+	}
+
 	line.AddTag("name", name)
 
-	return line
-}
+	cpuTime, err := process.Times()
+	if err == nil {
+		line.AddField("cpu_time_iowait", cpuTime.Iowait)
+		line.AddField("cpu_time_user", cpuTime.User)
+		line.AddField("cpu_time_system", cpuTime.System)
+	}
 
-func Test(blah any) {
-	value := fmt.Sprintf("%v", blah)
-	fmt.Println(value)
+	return line
 }
 
 func main() {
