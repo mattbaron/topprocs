@@ -59,7 +59,13 @@ func GatherMetrics(measurement string, process *process.Process) *line.Line {
 
 	line.AddField("num_threads", numThreads)
 
-	name, _ := process.Name()
+	line.AddTag("pid", process.Pid)
+
+	name, err := process.Name()
+	if err != nil {
+		return nil
+	}
+
 	line.AddTag("name", name)
 
 	return line
