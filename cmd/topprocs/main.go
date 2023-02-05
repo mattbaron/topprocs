@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mattbaron/topprocs/line"
+	"github.com/mattbaron/topprocs/influx"
 	"github.com/mattbaron/topprocs/procs"
 )
 
@@ -27,7 +27,7 @@ func main() {
 			continue
 		}
 
-		line := line.NewLine("topprocs")
+		line := influx.NewLine("topprocs")
 		line.AddTags(proc.Tags())
 		line.AddFields(proc.Fields())
 		fmt.Println(line.ToString())

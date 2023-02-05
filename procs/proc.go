@@ -3,7 +3,7 @@ package procs
 import (
 	"fmt"
 
-	"github.com/mattbaron/topprocs/line"
+	"github.com/mattbaron/topprocs/influx"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/process"
 )
@@ -93,8 +93,8 @@ func (proc *Proc) GatherMetrics() error {
 	return nil
 }
 
-func (proc Proc) Tags() line.Tags {
-	tags := line.Tags{
+func (proc Proc) Tags() influx.Tags {
+	tags := influx.Tags{
 		"name": proc.Name,
 		"pid":  fmt.Sprint(proc.Pid),
 		"user": proc.User,
@@ -103,8 +103,8 @@ func (proc Proc) Tags() line.Tags {
 	return tags
 }
 
-func (proc Proc) Fields() line.Fields {
-	fields := line.Fields{
+func (proc Proc) Fields() influx.Fields {
+	fields := influx.Fields{
 		"cpu_usage":       proc.CPUPercent,
 		"memory_usage":    proc.MemoryPercent,
 		"memory_rss":      proc.MemoryInfo.RSS,

@@ -20,5 +20,3 @@ export GOOS=windows
 export GOARACH=386
 
 go build -o topprocs.exe cmd/topprocs/main.go
-
-# scp topprocs.linux homer:
