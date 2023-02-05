@@ -3,10 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/mattbaron/topprocs/line"
 	"github.com/mattbaron/topprocs/procs"
 )
+
+var progname = filepath.Base(os.Args[0])
 
 func main() {
 	filter := procs.NewFilter()
@@ -19,6 +23,10 @@ func main() {
 	interestingProcs := procs.FindInteresting(filter)
 
 	for _, proc := range interestingProcs {
+		if proc.Name == progname {
+			continue
+		}
+
 		line := line.NewLine("topprocs")
 		line.AddTags(proc.Tags())
 		line.AddFields(proc.Fields())

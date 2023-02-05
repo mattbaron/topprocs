@@ -3,7 +3,7 @@
 #
 # Build for current platform (i.e. macOS/Darwin)
 #
-go build -o topprocs cmd/topprocs/main.go
+go build -o topprocs.local cmd/topprocs/main.go
 
 #
 # Build for linux/386
@@ -11,7 +11,7 @@ go build -o topprocs cmd/topprocs/main.go
 export GOOS=linux
 export GOARCH=386
 
-go build -o topprocs.linux cmd/topprocs/main.go
+go build -o topprocs cmd/topprocs/main.go
 
 #
 # Build for Windows/386
@@ -21,4 +21,4 @@ export GOARACH=386
 
 go build -o topprocs.exe cmd/topprocs/main.go
 
-scp topprocs.linux homer:
+# scp topprocs.linux homer:
