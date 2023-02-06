@@ -18,6 +18,7 @@ type Proc struct {
 	MemoryInfo    process.MemoryInfoStat
 	NumThreads    int32
 	User          string
+	Errors        []error
 }
 
 func NewProc(pid int32) *Proc {
@@ -28,14 +29,18 @@ func NewProc(pid int32) *Proc {
 		return nil
 	}
 
-	proc := Proc{p: process}
+	proc := Proc{
+		p:      process,
+		Errors: make([]error, 0),
+	}
+
 	err = proc.GatherMetrics()
 
 	if err != nil {
-		return nil
-	} else {
-		return &proc
+		proc.Errors = append(proc.Errors, err)
 	}
+
+	return &proc
 }
 
 func (proc *Proc) GatherMetrics() error {
@@ -73,7 +78,7 @@ func (proc *Proc) GatherMetrics() error {
 	if err == nil {
 		proc.User = user
 	} else {
-		return err
+		proc.User = "unknown"
 	}
 
 	memoryInfo, err := proc.p.MemoryInfo()
@@ -133,13 +138,23 @@ func AllPids() []int32 {
 	return pids
 }
 
-func FindInteresting(filter Filter) []*Proc {
+func FindInteresting(filter Filter, debug bool) []*Proc {
 	procs := make([]*Proc, 0)
 
 	for _, pid := range AllPids() {
 		proc := NewProc(pid)
 
 		if proc == nil {
+			if debug {
+				fmt.Println("Failed to create Proc() for " + fmt.Sprint(pid))
+			}
+			continue
+		}
+
+		if len(proc.Errors) > 0 {
+			if debug {
+				fmt.Println("Error creating Proc() for " + fmt.Sprint(pid) + ": " + fmt.Sprint(proc.Errors[0]))
+			}
 			continue
 		}
 
