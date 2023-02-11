@@ -5,7 +5,7 @@ type Filter struct {
 	CPUPercent    float64
 	MemoryPercent float64
 	Threads       int64
-	Users         []string
+	MemoryVMS     uint64
 }
 
 func NewFilter() Filter {
@@ -13,7 +13,7 @@ func NewFilter() Filter {
 		CPUPercent:    1.0,
 		MemoryPercent: 1.0,
 		Threads:       40,
-		Users:         make([]string, 0),
+		MemoryVMS:     10000000,
 	}
 }
 

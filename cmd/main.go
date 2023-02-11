@@ -13,10 +13,6 @@ import (
 
 var progname = filepath.Base(os.Args[0])
 
-func Debug() {
-
-}
-
 func main() {
 	filter := procs.NewFilter()
 
