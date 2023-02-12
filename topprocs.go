@@ -2,7 +2,7 @@ package topprocs
 
 import (
 	_ "embed"
-
+	
 	"github.com/influxdata/telegraf"
 	"github.com/influxdata/telegraf/plugins/inputs"
 	"github.com/mattbaron/topprocs/procs"
@@ -13,6 +13,7 @@ var sampleConfig string
 
 type TopProcs struct {
 	Filter        procs.Filter
+	Log           telegraf.Logger `toml:"-"`
 	CPUPercent    float64 `toml:"cpu_usage"`
 	MemoryPercent float64 `toml:"memory_usage"`
 	Threads       int64   `toml:"num_threads"`
@@ -27,6 +28,9 @@ func NewTopProcs() *TopProcs {
 		Threads:       topProcs.Threads,
 		MemoryVMS:     topProcs.MemoryVMS,
 	}
+	
+	topProcs.Log.Info(topProcs.Filter)
+
 	return &topProcs
 }
 
@@ -39,12 +43,12 @@ func (topProcs *TopProcs) Gather(acc telegraf.Accumulator) error {
 	for _, proc := range interestingProcs {
 		acc.AddFields("topprocs", proc.Fields(), proc.Tags())
 	}
-
+	
 	return nil
 }
 
 func init() {
 	inputs.Add("topprocs", func() telegraf.Input {
-		return &TopProcs{}
+		return NewTopProcs()
 	})
 }
