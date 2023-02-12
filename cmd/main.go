@@ -19,9 +19,9 @@ func main() {
 	versionFlag := flag.Bool("version", false, "help message for flag n")
 	debugFlag := flag.Bool("debug", false, "Debugging")
 
-	flag.Float64Var(&filter.CPUPercent, "cpu-percent", 1.0, "CPU filter")
-	flag.Float64Var(&filter.MemoryPercent, "mem-percent", 1.0, "Memory filter")
-	flag.Int64Var(&filter.Threads, "threads", 50, "Thread filter")
+	flag.Float64Var(&filter.CPUPercent, "cpu_usage", 1.0, "CPU filter")
+	flag.Float64Var(&filter.MemoryPercent, "memory_usage", 1.0, "Memory filter")
+	flag.Int64Var(&filter.Threads, "num_threads", 50, "Thread filter")
 	flag.Parse()
 
 	if *versionFlag {
