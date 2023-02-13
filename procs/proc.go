@@ -78,7 +78,12 @@ func (proc *Proc) GatherMetrics() error {
 	if err == nil {
 		proc.User = user
 	} else {
-		proc.User = "unknown"
+		uids, err := proc.p.Uids()
+		if err == nil && len(uids) > 0 {
+			proc.User = fmt.Sprint(uids[0])
+		} else {
+			proc.User = "unknown"
+		}
 	}
 
 	memoryInfo, err := proc.p.MemoryInfo()
