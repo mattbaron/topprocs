@@ -2,7 +2,7 @@ package topprocs
 
 import (
 	_ "embed"
-	
+
 	"github.com/influxdata/telegraf"
 	"github.com/influxdata/telegraf/plugins/inputs"
 	"github.com/mattbaron/topprocs/procs"
@@ -12,26 +12,12 @@ import (
 var sampleConfig string
 
 type TopProcs struct {
-	Filter        procs.Filter
-	Log           telegraf.Logger `toml:"-"`
-	CPUPercent    float64 `toml:"cpu_usage"`
-	MemoryPercent float64 `toml:"memory_usage"`
-	Threads       int64   `toml:"num_threads"`
-	MemoryVMS     uint64  `toml:"memory_vms"`
-}
-
-func NewTopProcs() *TopProcs {
-	topProcs := TopProcs{}
-	topProcs.Filter = procs.Filter{
-		CPUPercent:    topProcs.CPUPercent,
-		MemoryPercent: topProcs.MemoryPercent,
-		Threads:       topProcs.Threads,
-		MemoryVMS:     topProcs.MemoryVMS,
-	}
-	
-	topProcs.Log.Info(topProcs.Filter)
-
-	return &topProcs
+	Log         telegraf.Logger
+	CPUUsage    float64 `toml:"cpu_usage"`
+	MemoryUsage float64 `toml:"memory_usage"`
+	NumThreads  int64   `toml:"num_threads"`
+	MemoryVMS   uint64  `toml:"memory_vms"`
+	Filter      procs.Filter
 }
 
 func (*TopProcs) SampleConfig() string {
@@ -39,16 +25,33 @@ func (*TopProcs) SampleConfig() string {
 }
 
 func (topProcs *TopProcs) Gather(acc telegraf.Accumulator) error {
+	topProcs.Log.Infof("Gather() Filter: %v\n", topProcs.Filter)
 	interestingProcs := procs.FindInteresting(topProcs.Filter, false)
 	for _, proc := range interestingProcs {
 		acc.AddFields("topprocs", proc.Fields(), proc.Tags())
 	}
-	
+
+	return nil
+}
+
+func (topProcs *TopProcs) Init() error {
+	topProcs.Log.Info("Init()")
+	topProcs.Filter = procs.Filter{
+		CPUUsage:    topProcs.CPUUsage,
+		MemoryUsage: topProcs.MemoryUsage,
+		NumThreads:  topProcs.NumThreads,
+		MemoryVMS:   topProcs.MemoryVMS,
+	}
 	return nil
 }
 
 func init() {
 	inputs.Add("topprocs", func() telegraf.Input {
-		return NewTopProcs()
+		return &TopProcs{
+			CPUUsage:    1.0,
+			MemoryUsage: 1.0,
+			NumThreads:  50,
+			MemoryVMS:   1073741824,
+		}
 	})
 }
