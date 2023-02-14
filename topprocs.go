@@ -25,7 +25,6 @@ func (*TopProcs) SampleConfig() string {
 }
 
 func (topProcs *TopProcs) Gather(acc telegraf.Accumulator) error {
-	topProcs.Log.Infof("Gather() Filter: %v\n", topProcs.Filter)
 	interestingProcs := procs.FindInteresting(topProcs.Filter, false)
 	for _, proc := range interestingProcs {
 		acc.AddFields("topprocs", proc.Fields(), proc.Tags())
@@ -35,7 +34,6 @@ func (topProcs *TopProcs) Gather(acc telegraf.Accumulator) error {
 }
 
 func (topProcs *TopProcs) Init() error {
-	topProcs.Log.Info("Init()")
 	topProcs.Filter = procs.Filter{
 		CPUUsage:    topProcs.CPUUsage,
 		MemoryUsage: topProcs.MemoryUsage,
