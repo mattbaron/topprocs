@@ -6,6 +6,7 @@ type Filter struct {
 	MemoryUsage float64
 	NumThreads  int64
 	MemoryVMS   uint64
+	AgeMS       int64
 }
 
 func NewFilter() Filter {
@@ -14,11 +15,16 @@ func NewFilter() Filter {
 		MemoryUsage: 1.0,
 		NumThreads:  50,
 		MemoryVMS:   5368709120,
+		AgeMS:       -1,
 	}
 }
 
-func (filter Filter) Match(p Proc) bool {
-	return p.CPUPercent >= filter.CPUUsage ||
-		p.MemoryPercent >= float32(filter.MemoryUsage) ||
-		p.NumThreads >= int32(filter.NumThreads)
+func (filter Filter) Match(proc Proc) bool {
+	if filter.AgeMS > 0 && proc.AgeMS < filter.AgeMS {
+		return false
+	}
+
+	return proc.CPUPercent >= filter.CPUUsage ||
+		proc.MemoryPercent >= float32(filter.MemoryUsage) ||
+		proc.NumThreads >= int32(filter.NumThreads)
 }

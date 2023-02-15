@@ -2,6 +2,7 @@ package procs
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/mattbaron/topprocs/influx"
 	"github.com/shirou/gopsutil/cpu"
@@ -19,6 +20,7 @@ type Proc struct {
 	NumThreads    int32
 	User          string
 	Errors        []error
+	AgeMS         int64
 }
 
 func NewProc(pid int32) *Proc {
@@ -45,6 +47,13 @@ func NewProc(pid int32) *Proc {
 
 func (proc *Proc) GatherMetrics() error {
 	proc.Pid = proc.p.Pid
+
+	createTime, err := proc.p.CreateTime()
+	if err == nil {
+		proc.AgeMS = time.Now().UnixMilli() - createTime
+	} else {
+		return err
+	}
 
 	cpuPercent, err := proc.p.CPUPercent()
 	if err == nil {

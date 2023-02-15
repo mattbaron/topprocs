@@ -17,6 +17,7 @@ type TopProcs struct {
 	MemoryUsage float64 `toml:"memory_usage"`
 	NumThreads  int64   `toml:"num_threads"`
 	MemoryVMS   uint64  `toml:"memory_vms"`
+	AgeMS       int64   `toml:"age"`
 	Filter      procs.Filter
 }
 
@@ -39,6 +40,7 @@ func (topProcs *TopProcs) Init() error {
 		MemoryUsage: topProcs.MemoryUsage,
 		NumThreads:  topProcs.NumThreads,
 		MemoryVMS:   topProcs.MemoryVMS,
+		AgeMS:       topProcs.AgeMS,
 	}
 	return nil
 }
@@ -50,6 +52,7 @@ func init() {
 			MemoryUsage: 1.0,
 			NumThreads:  50,
 			MemoryVMS:   1073741824,
+			AgeMS:       2000,
 		}
 	})
 }

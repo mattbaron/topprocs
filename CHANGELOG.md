@@ -1,5 +1,8 @@
 # topprocs
 
+## v0.2.5
+- Add filter on minimum process age
+
 ## v0.2.4
 - Remove filtering on `MemoryVMS`.  Need to do analysis on these metrics to find decent defaults.
 
